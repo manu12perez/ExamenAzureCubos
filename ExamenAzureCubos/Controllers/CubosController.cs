@@ -35,5 +35,16 @@ namespace ExamenAzureCubos.Controllers
             await this.repo.InsertUsuarioAsync(nombre, email, pass, imagen);
             return Ok();
         }
+
+        [HttpGet("Perfil/{email}")]
+        public async Task<ActionResult<Usuario>> GetPerfil(string email)
+        {
+            var usuario = await this.repo.GetPerfilAsync(email);
+            if (usuario != null)
+            {
+                return Ok(usuario);
+            }            
+            return NotFound(new { mensaje = "Usuario no encontrado" });
+        }
     }
 }

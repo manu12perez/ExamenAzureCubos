@@ -8,15 +8,15 @@ namespace ExamenAzureCubos.Models
     {
         [Key]
         [Column("id_pedido")]
-        public int IdPedido;
+        public int IdPedido { get; set; }
 
         [Column("id_cubo")]
-        public int IdCubo;
+        public int IdCubo { get; set; }
 
         [Column("id_usuario")]
-        public int IdUsuario;
+        public int IdUsuario { get; set; }
 
         [Column("fechapedido")]
-        public DateTime FechaPedido;
+        public DateTime FechaPedido { get; set; }
     }
 }

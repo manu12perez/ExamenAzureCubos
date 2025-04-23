@@ -44,5 +44,10 @@ namespace ExamenAzureCubos.Repositories
             await this.context.Usuarios.AddAsync(usuario);
             await this.context.SaveChangesAsync();
         }
+
+        public async Task<Usuario> GetPerfilAsync(string email)
+        {
+            return await this.context.Usuarios.FirstOrDefaultAsync(x => x.Email == email);
+        }
     }
 }

@@ -8,18 +8,18 @@ namespace ExamenAzureCubos.Models
     {
         [Key]
         [Column("ID_USUARIO")]
-        public int IdUsuario;
+        public int IdUsuario { get; set; }
 
         [Column("NOMBRE")]
-        public string Nombre;
+        public string Nombre { get; set; }
 
         [Column("EMAIL")]
-        public string Email;
+        public string Email { get; set; }
 
         [Column("PASS")]
-        public string Pass;
+        public string Pass { get; set; }
 
         [Column("IMAGEN")]
-        public string Imagen;
+        public string Imagen { get; set; }
     }
 }
