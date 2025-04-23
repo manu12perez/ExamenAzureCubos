@@ -49,5 +49,12 @@ namespace ExamenAzureCubos.Repositories
         {
             return await this.context.Usuarios.FirstOrDefaultAsync(x => x.Email == email);
         }
+
+        public async Task<Usuario> LogInUsuairosAsync(string email, string pass)
+        {
+            return await this.context.Usuarios
+                .Where(x => x.Email == email && x.Pass == pass)
+                .FirstOrDefaultAsync();
+        }
     }
 }

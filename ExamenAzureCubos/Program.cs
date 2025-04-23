@@ -1,39 +1,65 @@
-using Azure.Identity;
+using ApiOAuthEmpleados.Data;
+using ApiOAuthEmpleados.Helpers;
+using ApiOAuthEmpleados.Repositories;
 using Azure.Security.KeyVault.Secrets;
 using ExamenAzureCubos.Data;
 using ExamenAzureCubos.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ---------- Configuración Key Vault ----------
-string keyVaultUrl = "https://keyvaultcubosmpb.vault.azure.net/";
-var credential = new DefaultAzureCredential();
-var secretClient = new SecretClient(new Uri(keyVaultUrl), credential);
+/***********************************************************************************************************/
+HelperActionServicesOAuth helper = new HelperActionServicesOAuth(builder.Configuration);
+builder.Services.AddSingleton<HelperActionServicesOAuth>(helper);
+builder.Services.AddAuthentication(helper.GetAuthenticateSchema()).AddJwtBearer(helper.GetJwtBearerOptions());
+HelperCryptography.Initialize(builder.Configuration);
+builder.Services.AddHttpContextAccessor();
 
-// Recuperar el secreto sin async/await
-KeyVaultSecret secret = secretClient.GetSecret("SqlAzure");
+builder.Services.AddAzureClients(factory =>
+{
+    factory.AddSecretClient(builder.Configuration.GetSection("KeyVault"));
+});
+SecretClient secretClient = builder.Services.BuildServiceProvider().GetService<SecretClient>();
+KeyVaultSecret secret = await secretClient.GetSecretAsync("SqlAzure");
+/***********************************************************************************************************/
+
+// Add services to the container.
+/***********************************************************************************************************/
+//string connectionString = builder.Configuration.GetConnectionString("SqlAzure");
 string connectionString = secret.Value;
-
-// ---------- Configuración de servicios ----------
-builder.Services.AddSingleton(secretClient);
-builder.Services.AddDbContext<CubosContext>(options =>
-    options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<CubosContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddTransient<RepositoryCubos>();
+/***********************************************************************************************************/
+
 builder.Services.AddControllers();
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// ---------- Middleware ----------
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    //app.MapOpenApi();
+}
+
+/***********************************************************************************************************/
 app.MapOpenApi();
 app.UseSwaggerUI(options =>
 {
-    options.SwaggerEndpoint("/openapi/v1.json", "Api Cubos");
+    options.SwaggerEndpoint("/openapi/v1.json", "Api Seguridad Cubos");
     options.RoutePrefix = "";
 });
+/***********************************************************************************************************/
 
 app.UseHttpsRedirection();
+
+/***********************************************************************************************************/
+app.UseAuthentication();
+/***********************************************************************************************************/
 app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();
