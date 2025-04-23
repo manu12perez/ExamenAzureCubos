@@ -56,5 +56,24 @@ namespace ExamenAzureCubos.Repositories
                 .Where(x => x.Email == email && x.Pass == pass)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<List<Compra>> GetComprasByUsuarioAsync(int idUsuario)
+        {
+            return await this.context.Compras
+                .Where(p => p.IdUsuario == idUsuario)
+                .ToListAsync();
+        }
+
+        public async Task InsertPedidoAsync(int idCubo, int idUsuario)
+        {
+            Compra compra = new Compra
+            {
+                IdCubo = idCubo,
+                IdUsuario = idUsuario,
+                FechaPedido = DateTime.Now
+            };
+            this.context.Compras.Add(compra);
+            await this.context.SaveChangesAsync();
+        }
     }
 }
